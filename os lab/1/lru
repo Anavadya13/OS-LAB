@@ -1,0 +1,74 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    int n, m, i, j, page, page_faults = 0;
+    int pages[100], frames[100], last_used[100];
+
+    // Input number of pages
+    printf("Enter number of pages: ");
+    scanf("%d", &n);
+
+    // Input page reference sequence
+    printf("Enter page reference sequence: ");
+    for(i = 0; i < n; i++) {
+        scanf("%d", &pages[i]);
+    }
+
+    // Input number of frames
+    printf("Enter number of frames: ");
+    scanf("%d", &m);
+
+    // Initialize frames and last_used
+    for(i = 0; i < m; i++) {
+        frames[i] = -1;
+        last_used[i] = -1;
+    }
+
+    // Process the page reference sequence
+    for(i = 0; i < n; i++) {
+        page = pages[i];
+        int found = 0;
+
+        // Check if page is already in frames
+        for(j = 0; j < m; j++) {
+            if(frames[j] == page) {
+                found = 1;
+                last_used[j] = i; // Update last used time
+                break;
+            }
+        }
+
+        if(!found) {
+            // If there's an empty frame
+            int replaced = 0;
+            for(j = 0; j < m; j++) {
+                if(frames[j] == -1) {
+                    frames[j] = page;
+                    last_used[j] = i; // Update last used time
+                    replaced = 1;
+                    page_faults++;
+                    break;
+                }
+            }
+
+            // If all frames are full, replace the LRU page
+            if(!replaced) {
+                int lru_index = 0;
+                for(j = 1; j < m; j++) {
+                    if(last_used[j] < last_used[lru_index]) {
+                        lru_index = j;
+                    }
+                }
+                frames[lru_index] = page;
+                last_used[lru_index] = i; // Update last used time
+                page_faults++;
+            }
+        }
+    }
+
+    // Output total page faults
+    printf("Total Page Faults: %d\n", page_faults);
+
+    return 0;
+}
