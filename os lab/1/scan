@@ -1,0 +1,93 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int compare_asc(const void *a, const void *b) {
+    return (*(int*)a - *(int*)b);
+}
+
+int compare_desc(const void *a, const void *b) {
+    return (*(int*)b - *(int*)a);
+}
+
+int main() {
+    int n, i, j, size, initial, direction, TotalHeadMovement = 0;
+    int RQ[100], left[100], right[100];
+    int left_count = 0, right_count = 0;
+
+    // Input number of requests
+    printf("Number of requests: ");
+    scanf("%d", &n);
+
+    // Input the request sequence
+    printf("Enter request sequence: ");
+    for(i = 0; i < n; i++) {
+        scanf("%d", &RQ[i]);
+    }
+
+    // Input initial head position
+    printf("Enter initial head position: ");
+    scanf("%d", &initial);
+
+    // Input total size of the disk
+    printf("Enter total size of the disk: ");
+    scanf("%d", &size);
+
+    // Input initial direction (0 for left, 1 for right)
+    printf("Enter initial direction (0 for left, 1 for right): ");
+    scanf("%d", &direction);
+
+    // Separate requests into left and right of the initial head position
+    for(i = 0; i < n; i++) {
+        if (RQ[i] < initial) {
+            left[left_count++] = RQ[i];
+        } else {
+            right[right_count++] = RQ[i];
+        }
+    }
+
+    // Sort left in descending order
+    qsort(left, left_count, sizeof(int), compare_desc);
+
+    // Sort right in ascending order
+    qsort(right, right_count, sizeof(int), compare_asc);
+
+    // Service the requests
+    if (direction == 1) {
+        // Move to the right
+        for(i = 0; i < right_count; i++) {
+            TotalHeadMovement += abs(right[i] - initial);
+            initial = right[i];
+        }
+        // Move to the end of the disk
+        if (right_count > 0) {
+            TotalHeadMovement += abs(size - right[right_count - 1] - 1);
+            initial = size - 1;
+        }
+        // Move to the left
+        for(i = 0; i < left_count; i++) {
+            TotalHeadMovement += abs(initial - left[i]);
+            initial = left[i];
+        }
+    } else {
+        // Move to the left
+        for(i = 0; i < left_count; i++) {
+            TotalHeadMovement += abs(left[i] - initial);
+            initial = left[i];
+        }
+        // Move to the start of the disk
+        if (left_count > 0) {
+            TotalHeadMovement += abs(left[left_count - 1]);
+            initial = 0;
+        }
+        // Move to the right
+        for(i = 0; i < right_count; i++) {
+            TotalHeadMovement += abs(right[i] - initial);
+            initial = right[i];
+        }
+    }
+
+    // Output the total head movement
+    printf("Total Head Movement is %d\n", TotalHeadMovement);
+
+    return 0;
+}
