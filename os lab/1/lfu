@@ -1,0 +1,81 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+
+int main() {
+    int n, m, i, j, page, page_faults = 0;
+    int pages[100], frames[100], frequency[100], time[100], current_time = 0;
+
+    // Input number of pages
+    printf("Enter number of pages: ");
+    scanf("%d", &n);
+
+    // Input page reference sequence
+    printf("Enter page reference sequence: ");
+    for(i = 0; i < n; i++) {
+        scanf("%d", &pages[i]);
+    }
+
+    // Input number of frames
+    printf("Enter number of frames: ");
+    scanf("%d", &m);
+
+    // Initialize frames, frequency, and time
+    for(i = 0; i < m; i++) {
+        frames[i] = -1;
+        frequency[i] = 0;
+        time[i] = -1;
+    }
+
+    // Process the page reference sequence
+    for(i = 0; i < n; i++) {
+        page = pages[i];
+        int found = 0;
+
+        // Check if page is already in frames
+        for(j = 0; j < m; j++) {
+            if(frames[j] == page) {
+                found = 1;
+                frequency[j]++;
+                time[j] = current_time;
+                break;
+            }
+        }
+
+        if(!found) {
+            int lfu_index = 0;
+            for(j = 1; j < m; j++) {
+                if(frames[j] == -1) {
+                    lfu_index = j;
+                    break;
+                }
+                if(frequency[j] < frequency[lfu_index]) {
+                    lfu_index = j;
+                } else if(frequency[j] == frequency[lfu_index] && time[j] < time[lfu_index]) {
+                    lfu_index = j;
+                }
+            }
+
+            // If frame is empty, use it
+            if(frames[lfu_index] == -1) {
+                frames[lfu_index] = page;
+                frequency[lfu_index] = 1;
+                time[lfu_index] = current_time;
+            } else {
+                // Replace least frequently used page
+                frames[lfu_index] = page;
+                frequency[lfu_index] = 1;
+                time[lfu_index] = current_time;
+            }
+
+            page_faults++;
+        }
+
+        current_time++;
+    }
+
+    // Output total page faults
+    printf("Total Page Faults: %d\n", page_faults);
+
+    return 0;
+}
