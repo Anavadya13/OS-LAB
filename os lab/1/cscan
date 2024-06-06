@@ -1,0 +1,66 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    int n, i, RQ[100], initial, disk_size, TotalHeadMovement = 0;
+    
+    // Input number of requests
+    printf("Number of requests: ");
+    scanf("%d", &n);
+    
+    // Input request sequence
+    printf("Enter request sequence: ");
+    for(i = 0; i < n; i++) {
+        scanf("%d", &RQ[i]);
+    }
+    
+    // Input initial head position
+    printf("Enter initial head position: ");
+    scanf("%d", &initial);
+    
+    // Input disk size
+    printf("Enter disk size: ");
+    scanf("%d", &disk_size);
+    
+    // Sort the request sequence
+    for(i = 0; i < n-1; i++) {
+        for(int j = 0; j < n-i-1; j++) {
+            if(RQ[j] > RQ[j+1]) {
+                int temp = RQ[j];
+                RQ[j] = RQ[j+1];
+                RQ[j+1] = temp;
+            }
+        }
+    }
+    
+    // Service the requests
+    int current_position = initial;
+    
+    // Move towards the end of the disk
+    for(i = 0; i < n; i++) {
+        if(RQ[i] >= initial) {
+            TotalHeadMovement += abs(RQ[i] - current_position);
+            current_position = RQ[i];
+        }
+    }
+    
+    // Move to the end of the disk and then to the start
+    if(current_position != disk_size - 1) {
+        TotalHeadMovement += abs((disk_size - 1) - current_position);
+        current_position = 0;
+        TotalHeadMovement += (disk_size - 1);
+    }
+    
+    // Service the remaining requests from the start
+    for(i = 0; i < n; i++) {
+        if(RQ[i] < initial) {
+            TotalHeadMovement += abs(RQ[i] - current_position);
+            current_position = RQ[i];
+        }
+    }
+    
+    // Output the total head movement
+    printf("Total Head Movement is %d\n", TotalHeadMovement);
+
+    return 0;
+}
