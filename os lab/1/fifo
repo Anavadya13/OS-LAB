@@ -1,0 +1,66 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    int n, m, i, j, page, page_faults = 0, index = 0;
+    int pages[100], frames[100], fifo_queue[100], queue_size = 0;
+
+    // Input number of pages
+    printf("Enter number of pages: ");
+    scanf("%d", &n);
+
+    // Input page reference sequence
+    printf("Enter page reference sequence: ");
+    for(i = 0; i < n; i++) {
+        scanf("%d", &pages[i]);
+    }
+
+    // Input number of frames
+    printf("Enter number of frames: ");
+    scanf("%d", &m);
+
+    // Initialize frames and fifo_queue
+    for(i = 0; i < m; i++) {
+        frames[i] = -1;
+    }
+
+    // Process the page reference sequence
+    for(i = 0; i < n; i++) {
+        page = pages[i];
+        int found = 0;
+
+        // Check if page is already in frames
+        for(j = 0; j < m; j++) {
+            if(frames[j] == page) {
+                found = 1;
+                break;
+            }
+        }
+
+        if(!found) {
+            // If the memory is full
+            if(queue_size == m) {
+                int page_to_remove = fifo_queue[index];
+                for(j = 0; j < m; j++) {
+                    if(frames[j] == page_to_remove) {
+                        frames[j] = page;
+                        break;
+                    }
+                }
+                fifo_queue[index] = page;
+                index = (index + 1) % m;
+            } else {
+                // If the memory is not full
+                frames[queue_size] = page;
+                fifo_queue[queue_size] = page;
+                queue_size++;
+            }
+            page_faults++;
+        }
+    }
+
+    // Output total page faults
+    printf("Total Page Faults: %d\n", page_faults);
+
+    return 0;
+}
